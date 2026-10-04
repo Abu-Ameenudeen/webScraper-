@@ -1,8 +1,8 @@
 import unittest
-from crawl import normalize_url
 from crawl import (
+    normalize_url,
     get_heading_from_html, 
-    get_first_paragraph_from_html
+    get_first_paragraph_from_html,
 )
 
 
