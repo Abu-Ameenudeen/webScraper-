@@ -8,7 +8,8 @@ class TestCrawl(unittest.TestCase):
         actual = normalize_url(input_url)
         expected = "www.boot.dev/blog/path"
         self.assertEqual(actual, expected)
-        
+    
+    
 
 if __name__ == "__main__":
     unittest.main()
