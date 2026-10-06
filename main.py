@@ -1,5 +1,7 @@
 import sys
 
+from crawl import get_html
+
 
 def main():
     if len(sys.argv) < 2:
@@ -13,6 +15,9 @@ def main():
     base_url = sys.argv[1]
 
     print(f"starting crawl of: {base_url}")
+
+    html = get_html(base_url)
+    print(html)
 
 
 if __name__ == "__main__":
