@@ -1,6 +1,7 @@
 from urllib.parse import (
     urlsplit,
     urljoin,
+    urlparse,
 )
 from bs4 import BeautifulSoup, Tag
 import requests
@@ -91,3 +92,36 @@ def get_html(url):
         raise Exception("response content type is not text/html")
 
     return response.text
+
+
+def crawl_page(base_url, current_url=None, page_data=None):
+    if current_url is None:
+        current_url = base_url
+
+    if page_data is None:
+        page_data = {}
+
+    base_domain = urlparse(base_url).netloc
+    current_domain = urlparse(current_url).netloc
+
+    if current_domain != base_domain:
+        return
+
+    normalized_url = normalize_url(current_url)
+
+    if normalized_url in page_data:
+        return
+
+    print(f"crawling: {current_url}")
+
+    try:
+        html = get_html(current_url)
+    except Exception as e:
+        print(f"error crawling {current_url}: {e}")
+        return
+
+    data = extract_page_data(html, current_url)
+    page_data[normalized_url] = data
+
+    for url in data["outgoing_links"]:
+        crawl_page(base_url, url, page_data)

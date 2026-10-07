@@ -1,6 +1,6 @@
 import sys
 
-from crawl import get_html
+from crawl import crawl_page
 
 
 def main():
@@ -16,8 +16,13 @@ def main():
 
     print(f"starting crawl of: {base_url}")
 
-    html = get_html(base_url)
-    print(html)
+    page_data = {}
+    crawl_page(base_url, page_data=page_data)
+
+    print(f"found {len(page_data)} pages")
+
+    for data in page_data.values():
+        print(data)
 
 
 if __name__ == "__main__":
