@@ -87,14 +87,22 @@ def extract_page_data(html: str, page_url: str):
 
 
 class AsyncCrawler:
-    def __init__(self, base_url, max_concurrency=1):
+    def __init__(self, base_url, max_concurrency=1, max_pages=10):
         self.base_url = base_url
         self.base_domain = urlparse(base_url).netloc
+
         self.page_data = {}
         self.visited = set()
+
         self.lock = asyncio.Lock()
+
         self.max_concurrency = max_concurrency
         self.semaphore = asyncio.Semaphore(max_concurrency)
+
+        self.max_pages = max_pages
+        self.should_stop = False
+        self.all_tasks = set()
+
         self.session = None
 
     async def __aenter__(self):
@@ -106,7 +114,15 @@ class AsyncCrawler:
 
     async def add_page_visit(self, normalized_url):
         async with self.lock:
+            if self.should_stop:
+                return False
+
             if normalized_url in self.visited:
+                return False
+
+            if len(self.visited) >= self.max_pages:
+                self.should_stop = True
+                print("Reached maximum number of pages to crawl.")
                 return False
 
             self.visited.add(normalized_url)
@@ -131,6 +147,9 @@ class AsyncCrawler:
             return await response.text()
 
     async def crawl_page(self, current_url):
+        if self.should_stop:
+            return
+
         current_domain = urlparse(current_url).netloc
 
         if current_domain != self.base_domain:
@@ -161,18 +180,25 @@ class AsyncCrawler:
             task = asyncio.create_task(
                 self.crawl_page(url)
             )
+
+            self.all_tasks.add(task)
             tasks.append(task)
 
-        await asyncio.gather(*tasks)
+        for task in tasks:
+            try:
+                await task
+            finally:
+                self.all_tasks.discard(task)
 
     async def crawl(self):
         await self.crawl_page(self.base_url)
         return self.page_data
 
 
-async def crawl_site_async(base_url):
+async def crawl_site_async(base_url, max_concurrency, max_pages):
     async with AsyncCrawler(
         base_url,
-        max_concurrency=5,
+        max_concurrency=max_concurrency,
+        max_pages=max_pages,
     ) as crawler:
         return await crawler.crawl()
