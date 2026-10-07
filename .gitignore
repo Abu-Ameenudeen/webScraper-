@@ -1,10 +1,32 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+# Python virtual environment
+.venv/
+venv/
+env/
 
-# Virtual environments
-.venv
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated crawler output
+report.json
+
+# Environment variables / secrets
+.env
+.env.*
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

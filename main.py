@@ -2,6 +2,7 @@ import asyncio
 import sys
 
 from crawl import crawl_site_async
+from json_report import write_json_report
 
 
 async def main():
@@ -26,10 +27,7 @@ async def main():
         max_pages,
     )
 
-    print(f"found {len(page_data)} pages")
-
-    for page in page_data.values():
-        print(page)
+    write_json_report(page_data)
 
 
 if __name__ == "__main__":
